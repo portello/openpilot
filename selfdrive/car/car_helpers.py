@@ -1,7 +1,7 @@
 import os
 from common.params import Params
 from common.basedir import BASEDIR
-from selfdrive.version import comma_remote, tested_branch
+from selfdrive.version import comma_remote, vw_community_remote, tested_branch
 from selfdrive.car.fingerprints import eliminate_incompatible_cars, all_known_cars
 from selfdrive.car.vin import get_vin, VIN_UNKNOWN
 from selfdrive.car.fw_versions import get_fw_versions, match_fw_to_car
@@ -15,7 +15,7 @@ HwType = log.HealthData.HwType
 
 
 def get_startup_event(car_recognized, controller_available):
-  if comma_remote and tested_branch:
+  if (comma_remote or vw_community_remote) and tested_branch:
     event = EventName.startup
   else:
     event = EventName.startupMaster
@@ -25,6 +25,13 @@ def get_startup_event(car_recognized, controller_available):
   elif car_recognized and not controller_available:
     event = EventName.startupNoControl
   return event
+
+
+def get_one_can(logcan):
+  while True:
+    can = messaging.recv_one_retry(logcan)
+    if len(can.can) > 0:
+      return can
 
 
 def load_interfaces(brand_names):
@@ -114,7 +121,7 @@ def fingerprint(logcan, sendcan, has_relay):
   done = False
 
   while not done:
-    a = messaging.get_one_can(logcan)
+    a = get_one_can(logcan)
 
     for can in a.can:
       # need to independently try to fingerprint both bus 0 and 1 to work

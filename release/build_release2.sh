@@ -6,6 +6,7 @@ export GIT_COMMITTER_NAME="Jason Young"
 export GIT_COMMITTER_EMAIL="jyoung8607@gmail.com"
 export GIT_AUTHOR_NAME="Jason Young"
 export GIT_AUTHOR_EMAIL="jyoung8607@gmail.com"
+
 export GIT_SSH_COMMAND="ssh -i /data/gitkey"
 
 # set CLEAN to build outside of CI
@@ -26,6 +27,7 @@ else
 fi
 
 git fetch origin release2-staging
+#git fetch origin dashcam-staging
 
 # Create release2 with no history
 if [ ! -z "$CLEAN" ]; then
@@ -37,8 +39,15 @@ fi
 VERSION=$(cat selfdrive/common/version.h | awk -F\" '{print $2}')
 git commit -m "openpilot v$VERSION"
 
-# Panda firmware would ordinarily build here, but only Comma can make release-signed builds.
-rm -f panda/board/obj/panda.bin.signed
+# Build signed panda firmware
+#pushd panda/board/
+#cp -r /tmp/pandaextra /data/openpilot/
+#RELEASE=1 make obj/panda.bin
+#mv obj/panda.bin /tmp/panda.bin
+#make clean
+#mv /tmp/panda.bin obj/panda.bin.signed
+#rm -rf /data/openpilot/pandaextra
+#popd
 
 # Build stuff
 ln -sfn /data/openpilot /data/pythonpath
@@ -75,4 +84,10 @@ if [ ! -z "$PUSH" ]; then
 
   # Push to release2-staging
   git push -f origin release2-staging
+
+  # Create dashcam release
+  #git rm selfdrive/car/*/carcontroller.py
+
+  #git commit -m "create dashcam release from release2"
+  #git push -f origin release2-staging:dashcam-staging
 fi

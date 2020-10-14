@@ -2,6 +2,7 @@ import os
 import time
 from cereal import car
 from common.kalman.simple_kalman import KF1D
+from common.params import Params
 from common.realtime import DT_CTRL
 from selfdrive.car import gen_empty_fingerprint
 from selfdrive.config import Conversions as CV
@@ -33,6 +34,9 @@ class CarInterfaceBase():
     if CarController is not None:
       self.CC = CarController(self.cp.dbc_name, CP, self.VM)
 
+    params = Params()
+    self.is_disengage_on_gas_enabled = params.get("IsDisengageOnGasEnabled", encoding='utf8') == "1"
+
   @staticmethod
   def calc_accel_override(a_ego, a_target, v_ego, v_target):
     return 1.
@@ -42,7 +46,7 @@ class CarInterfaceBase():
     raise NotImplementedError
 
   @staticmethod
-  def get_params(candidate, fingerprint=gen_empty_fingerprint(), has_relay=False, car_fw=[]):  # pylint: disable=dangerous-default-value
+  def get_params(candidate, fingerprint=gen_empty_fingerprint(), has_relay=False, car_fw=None):
     raise NotImplementedError
 
   # returns a set of default params to avoid repetition in car specific params
@@ -119,7 +123,7 @@ class CarInterfaceBase():
     # Disable on rising edge of gas or brake. Also disable on brake when speed > 0.
     # Optionally allow to press gas at zero speed to resume.
     # e.g. Chrysler does not spam the resume button yet, so resuming with gas is handy. FIXME!
-    if (cs_out.gasPressed and (not self.CS.out.gasPressed) and cs_out.vEgo > gas_resume_speed) or \
+    if (cs_out.gasPressed and self.is_disengage_on_gas_enabled and (not self.CS.out.gasPressed) and cs_out.vEgo > gas_resume_speed) or \
        (cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill)):
       events.add(EventName.pedalPressed)
 
@@ -137,13 +141,12 @@ class RadarInterfaceBase():
     self.pts = {}
     self.delay = 0
     self.radar_ts = CP.radarTimeStep
+    self.no_radar_sleep = 'NO_RADAR_SLEEP' in os.environ
 
   def update(self, can_strings):
     ret = car.RadarData.new_message()
-
-    if 'NO_RADAR_SLEEP' not in os.environ:
+    if not self.no_radar_sleep:
       time.sleep(self.radar_ts)  # radard runs on RI updates
-
     return ret
 
 class CarStateBase:
