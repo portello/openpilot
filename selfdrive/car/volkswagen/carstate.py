@@ -232,7 +232,7 @@ class CarState(CarStateBase):
 
     if CP.networkLocation == NetworkLocation.fwdCamera:
       # Extended CAN devices other than the camera are here on CANBUS.pt
-      signals += MQB_SIGNALS.FWDRADAR[0], MQB_SIGNALS.BSM[0]
+      signals += MQB_SIGNALS.FWDRADAR[0] + MQB_SIGNALS.BSM[0]
       checks += MQB_SIGNALS.FWDRADAR[1]  # FIXME: Add bsm conditional and checks[] when we have solid autodetection
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, CANBUS.pt)
@@ -245,7 +245,7 @@ class CarState(CarStateBase):
 
     if CP.networkLocation == NetworkLocation.gateway:
       # Extended CAN devices other than the camera are here on CANBUS.cam
-      signals += MQB_SIGNALS.FWDRADAR[0], MQB_SIGNALS.BSM[0]
+      signals += MQB_SIGNALS.FWDRADAR[0] + MQB_SIGNALS.BSM[0]
       checks += MQB_SIGNALS.FWDRADAR[1]  # FIXME: Add bsm conditional and checks[] when we have solid autodetection
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, CANBUS.cam)

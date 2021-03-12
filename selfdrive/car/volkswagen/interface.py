@@ -16,7 +16,7 @@ class CarInterface(CarInterfaceBase):
     self.buttonStatesPrev = BUTTON_STATES.copy()
 
     # Alias Extended CAN parser to PT/CAM parser, based on detected network location
-    self.cp_ext = self.cp if CP.networkLocation == NWL.fwdCamera else self.cp_cam
+    self.cp_ext = self.cp if CP.networkLocation == NetworkLocation.fwdCamera else self.cp_cam
 
   @staticmethod
   def compute_gb(accel, speed):
