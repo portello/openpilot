@@ -4,7 +4,7 @@ from selfdrive.config import Conversions as CV
 from selfdrive.car.interfaces import CarStateBase
 from opendbc.can.parser import CANParser
 from opendbc.can.can_define import CANDefine
-from selfdrive.car.volkswagen.values import DBC, CANBUS, TransmissionType, GearShifter, BUTTON_STATES, CarControllerParams
+from selfdrive.car.volkswagen.values import DBC, CANBUS, NetworkLocation, TransmissionType, GearShifter, BUTTON_STATES, CarControllerParams
 
 class CarState(CarStateBase):
   def __init__(self, CP):
@@ -261,7 +261,7 @@ class CarState(CarStateBase):
                   ("BCM1_Rueckfahrlicht_Schalter", "Gateway_72", 0)]  # Reverse light from BCM
       checks += [("Motor_14", 10)]  # From J623 Engine control module
 
-    if CP.networkLocation == NWL.fwdCamera:
+    if CP.networkLocation == NetworkLocation.fwdCamera:
       # Extended CAN devices other than the camera are here on CANBUS.pt
       signals += MQB_FWDRADAR[0], MQB_BSM[0]
       checks += MQB_FWDRADAR[1]  # FIXME: Add bsm conditional and checks[] when we have solid autodetection
@@ -275,7 +275,7 @@ class CarState(CarStateBase):
     signals = MQB_FWDCAMERA[0]
     checks = []
 
-    if CP.networkLocation == NWL.gateway:
+    if CP.networkLocation == NetworkLocation.gateway:
       # Extended CAN devices other than the camera are here on CANBUS.cam
       signals += MQB_FWDRADAR[0], MQB_BSM[0]
       checks += MQB_FWDRADAR[1]  # FIXME: Add bsm conditional and checks[] when we have solid autodetection
