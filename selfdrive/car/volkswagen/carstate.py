@@ -4,7 +4,7 @@ from selfdrive.config import Conversions as CV
 from selfdrive.car.interfaces import CarStateBase
 from opendbc.can.parser import CANParser
 from opendbc.can.can_define import CANDefine
-from selfdrive.car.volkswagen.values import DBC, CANBUS, NetworkLocation, TransmissionType, GearShifter, BUTTON_STATES, CarControllerParams
+from selfdrive.car.volkswagen.values import DBC, CANBUS, MQB_SIGNALS, NetworkLocation, TransmissionType, GearShifter, BUTTON_STATES, CarControllerParams
 
 class CarState(CarStateBase):
   def __init__(self, CP):
@@ -151,37 +151,6 @@ class CarState(CarStateBase):
 
     return ret
 
-  # Modular signal and message lists for optional or bus-portable controllers
-  MQB_FWDRADAR = ([
-      ("ACC_Status_ACC", "ACC_06", 0),              # ACC engagement status
-      ("ACC_Typ", "ACC_06", 0),                     # ACC type (follow to stop, stop&go)
-      ("SetSpeed", "ACC_02", 0),                    # ACC set speed
-      ("AWV2_Freigabe", "ACC_10", 0),               # FCW brake jerk release
-      ("ANB_Teilbremsung_Freigabe", "ACC_10", 0),   # AEB partial braking release
-      ("ANB_Zielbremsung_Freigabe", "ACC_10", 0),   # AEB target braking release
-    ],[
-      ("ACC_06", 50),                               # From J428 ACC radar control module
-      ("ACC_10", 50),                               # From J428 ACC radar control module
-      ("ACC_02", 17),                               # From J428 ACC radar control module
-    ])
-  MQB_FWDCAMERA = ([
-      ("LDW_SW_Warnung_links", "LDW_02", 0),        # Blind spot in warning mode on left side due to lane departure
-      ("LDW_SW_Warnung_rechts", "LDW_02", 0),       # Blind spot in warning mode on right side due to lane departure
-      ("LDW_Seite_DLCTLC", "LDW_02", 0),            # Direction of most likely lane departure (left or right)
-      ("LDW_DLC", "LDW_02", 0),                     # Lane departure, distance to line crossing
-      ("LDW_TLC", "LDW_02", 0),                     # Lane departure, time to line crossing
-    ],[
-      ("LDW_02", 10),                               # From R242 Driver assistance camera
-    ])
-  MQB_BSM = ([
-      ("SWA_Infostufe_SWA_li", "SWA_01", 0),        # Blind spot object info, left
-      ("SWA_Warnung_SWA_li", "SWA_01", 0),          # Blind spot object warning, left
-      ("SWA_Infostufe_SWA_re", "SWA_01", 0),        # Blind spot object info, right
-      ("SWA_Warnung_SWA_re", "SWA_01", 0),          # Blind spot object warning, right
-    ],[
-      ("SWA_01", 20),                               # From J1086 Lane Change Assist
-    ])
-
   @staticmethod
   def get_can_parser(CP):
     # this function generates lists for signal, messages and initial values
@@ -263,21 +232,20 @@ class CarState(CarStateBase):
 
     if CP.networkLocation == NetworkLocation.fwdCamera:
       # Extended CAN devices other than the camera are here on CANBUS.pt
-      signals += MQB_FWDRADAR[0], MQB_BSM[0]
-      checks += MQB_FWDRADAR[1]  # FIXME: Add bsm conditional and checks[] when we have solid autodetection
+      signals += MQB_SIGNALS.FWDRADAR[0], MQB_SIGNALS.BSM[0]
+      checks += MQB_SIGNALS.FWDRADAR[1]  # FIXME: Add bsm conditional and checks[] when we have solid autodetection
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, CANBUS.pt)
 
   @staticmethod
   def get_cam_can_parser(CP):
 
-    # FIXME: Add fwdCamera conditional and checks[] when we have solid autodetection
-    signals = MQB_FWDCAMERA[0]
+    signals = MQB_SIGNALS.FWDCAMERA[0]  # FIXME: Add fwdCamera conditional and checks[] when we have solid autodetection
     checks = []
 
     if CP.networkLocation == NetworkLocation.gateway:
       # Extended CAN devices other than the camera are here on CANBUS.cam
-      signals += MQB_FWDRADAR[0], MQB_BSM[0]
-      checks += MQB_FWDRADAR[1]  # FIXME: Add bsm conditional and checks[] when we have solid autodetection
+      signals += MQB_SIGNALS.FWDRADAR[0], MQB_SIGNALS.BSM[0]
+      checks += MQB_SIGNALS.FWDRADAR[1]  # FIXME: Add bsm conditional and checks[] when we have solid autodetection
 
     return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, CANBUS.cam)
