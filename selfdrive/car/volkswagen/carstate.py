@@ -152,7 +152,7 @@ class CarState(CarStateBase):
     return ret
 
   # Modular signal and message lists for optional or bus-portable controllers
-  MQB_FWDRADAR = {[
+  MQB_FWDRADAR = ([
       ("ACC_Status_ACC", "ACC_06", 0),              # ACC engagement status
       ("ACC_Typ", "ACC_06", 0),                     # ACC type (follow to stop, stop&go)
       ("SetSpeed", "ACC_02", 0),                    # ACC set speed
@@ -163,8 +163,8 @@ class CarState(CarStateBase):
       ("ACC_06", 50),                               # From J428 ACC radar control module
       ("ACC_10", 50),                               # From J428 ACC radar control module
       ("ACC_02", 17),                               # From J428 ACC radar control module
-    ]}
-  MQB_FWDCAMERA = {[
+    ])
+  MQB_FWDCAMERA = ([
       ("LDW_SW_Warnung_links", "LDW_02", 0),        # Blind spot in warning mode on left side due to lane departure
       ("LDW_SW_Warnung_rechts", "LDW_02", 0),       # Blind spot in warning mode on right side due to lane departure
       ("LDW_Seite_DLCTLC", "LDW_02", 0),            # Direction of most likely lane departure (left or right)
@@ -172,15 +172,15 @@ class CarState(CarStateBase):
       ("LDW_TLC", "LDW_02", 0),                     # Lane departure, time to line crossing
     ],[
       ("LDW_02", 10),                               # From R242 Driver assistance camera
-    ]}
-  MQB_BSM = {[
+    ])
+  MQB_BSM = ([
       ("SWA_Infostufe_SWA_li", "SWA_01", 0),        # Blind spot object info, left
       ("SWA_Warnung_SWA_li", "SWA_01", 0),          # Blind spot object warning, left
       ("SWA_Infostufe_SWA_re", "SWA_01", 0),        # Blind spot object info, right
       ("SWA_Warnung_SWA_re", "SWA_01", 0),          # Blind spot object warning, right
     ],[
       ("SWA_01", 20),                               # From J1086 Lane Change Assist
-    ]}
+    ])
 
   @staticmethod
   def get_can_parser(CP):
