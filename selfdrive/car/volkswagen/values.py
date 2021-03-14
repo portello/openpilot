@@ -42,7 +42,7 @@ BUTTON_STATES = {
 class MQB_FP_MSG:
   GETRIEBE_11 = 0xad
   EV_GEARSHIFT = 0x187
-  MOTOR_12 = 0xa8
+  TSK_07 = 0x31e
 
 class MQB_SIGNALS:
   # Additional signal and message lists to dynamically add for optional or bus-portable controllers
