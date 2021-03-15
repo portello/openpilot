@@ -168,12 +168,14 @@ class DriverStatus():
     pitch_error *= _PITCH_WEIGHT
     pose_metric = sqrt(yaw_error**2 + pitch_error**2)
 
-    if pose_metric > _METRIC_THRESHOLD*pose.cfactor:
-      return DistractedType.BAD_POSE
-    elif (blink.left_blink + blink.right_blink)*0.5 > _BLINK_THRESHOLD*blink.cfactor:
-      return DistractedType.BAD_BLINK
-    else:
-      return DistractedType.NOT_DISTRACTED
+#Roger
+#    if pose_metric > _METRIC_THRESHOLD*pose.cfactor:
+#      return DistractedType.BAD_POSE
+#    elif (blink.left_blink + blink.right_blink)*0.5 > _BLINK_THRESHOLD*blink.cfactor:
+#      return DistractedType.BAD_BLINK
+#    else:
+#      return DistractedType.NOT_DISTRACTED
+    return DistractedType.NOT_DISTRACTED
 
   def set_policy(self, model_data):
     ep = min(model_data.meta.engagedProb, 0.8) / 0.8
@@ -225,6 +227,12 @@ class DriverStatus():
       self.awareness_active = 1.
       self.awareness_passive = 1.
       return
+
+# Roger
+    self.awareness = 1.
+    self.awareness_active = 1.
+    self.awareness_passive = 1.
+    return
 
     driver_attentive = self.driver_distraction_filter.x < 0.37
     awareness_prev = self.awareness
